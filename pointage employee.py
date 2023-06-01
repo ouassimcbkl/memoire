@@ -43,7 +43,7 @@ window.geometry("925x500+200+100")
 window.configure(background='gray')
 window.resizable(False, False)
 
-image_icon = PhotoImage(file="C:\\Users\\Anis_\\OneDrive\\Bureau\\peter-dinklage\\1.png")
+image_icon = PhotoImage(file="C:\\Users\\Anis_\\OneDrive\\Bureau\\login.png")
 window.iconphoto(False,image_icon)
 
 pic = Image.open("C:\\Users\\Anis_\\Downloads\\Desktop - 4.png")

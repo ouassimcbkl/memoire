@@ -1,0 +1,8 @@
+pour executer il faut télécharger les package telque cv2 et mysql-connector et pillow et datetime et tkinter 
+
+pour pointer il faut  executer pointage employee.py
+
+
+si on executer entrer administrateur.py on vas entrer dans la partie administrateur pour gérer tout les employés
+
+si on execute employé.py on vas rentrer dans la partie employé pour voir tout ses informations

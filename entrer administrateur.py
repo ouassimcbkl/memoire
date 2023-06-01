@@ -23,7 +23,7 @@ import pathlib
 import sqlite3 
 
 root = Tk()
-root.title('login')
+root.title('CamPoint')
 root.geometry('925x500+200+100')
 root.configure(bg="#fff")
 # root.state('zoomed')
@@ -208,9 +208,9 @@ def now():
     absent_employees = cur.fetchall()
 
     # Create a Treeview widget
-    tree = ttk.Treeview(noot, columns=("Name"), show="headings")
+    tree = ttk.Treeview(noot, columns=("Nom"), show="headings")
 
-    tree.column("Name", width=100)
+    tree.column("Nom", width=100)
     
 
 
@@ -332,6 +332,11 @@ def signin():
         r.geometry('925x500+200+100')
         image_icon = PhotoImage(file="C:\\Users\\Anis_\\OneDrive\\Bureau\\login.png")
         r.iconphoto(False, image_icon)
+
+
+
+
+        
         def liste():
             liste_frame = tk.Frame(main_frame)
             db = mysql.connector.connect(
@@ -353,17 +358,17 @@ def signin():
             s.configure(".", font=('Helvetica', 11))
             s.configure("Treeview.Heading", foreground='#57a1f8', font=('Helvetica', 11, "bold"))
 
-    # Define number of columns
+        # Define number of columns
             tree["columns"] = ("id", "nom", "prenom", "titre", "age")
 
-    # Assign the width, minwidth, and anchor to the respective columns
+        # Assign the width, minwidth, and anchor to the respective columns
             tree.column("id", width=150, minwidth=100, anchor=tk.CENTER)
             tree.column("nom", width=150, minwidth=100, anchor=tk.CENTER)
             tree.column("prenom", width=150, minwidth=100, anchor=tk.CENTER)
             tree.column("titre", width=150, minwidth=150, anchor=tk.CENTER)
             tree.column("age", width=150, minwidth=150, anchor=tk.CENTER)
 
-    # Assign the heading names to the respective columns
+        # Assign the heading names to the respective columns
             tree.heading("id", text="Id", anchor=tk.CENTER)
             tree.heading("nom", text="Nom", anchor=tk.CENTER)
             tree.heading("prenom", text="Prénom", anchor=tk.CENTER)
@@ -371,23 +376,23 @@ def signin():
             tree.heading("age", text="Age", anchor=tk.CENTER)
             t = 1
             for row in rows:
-                if t % 2 == 0:
-                    tree.insert('', "end", text="", values=row, tags=("even",), iid=row[0])
-                else:
-                    tree.insert('', "end", text="", values=row, tags=("odd",), iid=row[0])
-                t += 1
+                    if t % 2 == 0:
+                        tree.insert('', "end", text="", values=row, tags=("even",), iid=row[0])
+                    else:
+                        tree.insert('', "end", text="", values=row, tags=("odd",), iid=row[0])
+                    t += 1
 
             tree.tag_configure("even", foreground='#57a1f8', background="black")
             tree.tag_configure("odd", foreground="black", background='#57a1f8')
             def get_selected_item(event):
-                selected_item = tree.selection()[0]
-                item_id = selected_item
-                print("ID sélectionné :", item_id)
+                    selected_item = tree.selection()[0]
+                    item_id = selected_item
+                    print("ID sélectionné :", item_id)
 
-    # Lier la fonction à l'événement de sélection d'une ligne
+        # Lier la fonction à l'événement de sélection d'une ligne
             tree.bind("<<TreeviewSelect>>", get_selected_item)
 
-    # Afficher le Treeview
+        # Afficher le Treeview
             tree.pack()
 
             hsb = ttk.Scrollbar(liste_frame, orient="horizontal")
@@ -400,13 +405,6 @@ def signin():
             tree.configure(yscrollcommand=vsb.set)
             vsb.pack(fill=tk.Y, side=tk.RIGHT)
 
-        
-        
-
-
-
-            
-
 
             liste_frame.pack(pady=20)
 
@@ -417,6 +415,181 @@ def signin():
             lb.pack()
 
             home_frame.pack(pady=20)
+            
+
+        def mod():
+            mod_frame = tk.Frame(main_frame)
+            db = mysql.connector.connect(
+                host="localhost",
+                user="root",
+                password="anis1234",
+                database='firstp'
+            )
+            cur = db.cursor()
+
+            # Function to clear all the data in the form
+            def clear_data():
+                first_name_entry.delete(0, 'end')
+                last_name_entry.delete(0, 'end')
+                spec_entry.delete(0, 'end')
+                email_entry.delete(0, 'end')
+                sal_entry.delete(0, 'end')
+                tel_entry.delete(0, 'end')
+                
+
+            # Function to prefill the form fields with employee data
+            def prefill_form():
+                # Get the employee ID from the ID entry
+                employe_id = id_entry.get()
+
+                # Select query to retrieve employee data
+                query = "SELECT Nomemployer, prenom, titre, age, email, tel, salaire FROM employer WHERE id = %s"
+                cur.execute(query, (employe_id,))
+                employee_data = cur.fetchone()
+
+                if employee_data is None:
+                    # ID not found, display error message
+                    messagebox.showerror("Error", "ID non trouvé dans la base de données!")
+
+                else:
+                    # Fill the form fields with employee data
+                    nom = employee_data[0]
+                    prenom = employee_data[1]
+                    titre = employee_data[2]
+                    age = employee_data[3]
+                    email = employee_data[4]
+                    tel = employee_data[5]
+                    salaire = employee_data[6]
+
+                    first_name_entry.delete(0, 'end')
+                    last_name_entry.delete(0, 'end')
+                    spec_entry.delete(0, 'end')
+                    email_entry.delete(0, 'end')
+                    sal_entry.delete(0, 'end')
+                    tel_entry.delete(0, 'end')
+                    age_spinbox.delete(0, 'end')
+
+                    first_name_entry.insert(0, nom)
+                    last_name_entry.insert(0, prenom)
+                    spec_entry.insert(0, titre)
+                    email_entry.insert(0, email)
+                    sal_entry.insert(0, salaire)
+                    tel_entry.insert(0, tel)
+                    age_spinbox.insert(0, age)
+
+            # Function to save the updated data to the database
+            def save_data():
+                # Get the values from the form fields
+                nom = first_name_entry.get()
+                prenom = last_name_entry.get()
+                titre = spec_entry.get()
+                email = email_entry.get()
+                tel = tel_entry.get()
+                salaire = sal_entry.get()
+                age = age_spinbox.get()
+                id = id_entry.get()
+
+                reqqq = "UPDATE employer SET Nomemployer = %s, prenom = %s, titre = %s, age = %s, email = %s, tel = %s, salaire = %s WHERE ID = %s"
+                listeup = (nom, prenom, titre, age, email, tel, salaire, id)
+                cur.execute(reqqq, listeup)
+                db.commit()
+                
+                # Close the database connection
+                cur.close()
+                db.close()
+
+                # Display a success message
+                messagebox.showinfo("Success", "Les données ont été sauvegardées avec succès!")
+
+
+                # Clear the form fields after saving
+                clear_data()
+
+            # Create the main window
+          
+
+            # Create the frame
+            form_frame = Frame(main_frame)
+            form_frame.pack(fill=BOTH, expand=True)
+
+            # Create the LabelFrame for the form
+            frame3 = LabelFrame(form_frame, text="Modifier", font=('arial', 20, 'bold'), bd=20, relief='ridge', bg='sky blue', fg='black')
+            frame3.place(x=-10, y=2)
+
+            # Create the form labels
+            first_name_label = Label(frame3, text="Nom employé", font=('arial', 14, 'bold'), bg='sky blue', fg='black')
+            first_name_label.grid(row=0, column=0, padx=20, pady=10)
+
+            last_name_label = Label(frame3, text="Prénom employé", font=('arial', 14, 'bold'), bg='sky blue', fg='black')
+            last_name_label.grid(row=1, column=0, padx=20, pady=10)
+
+            spec_label = Label(frame3, text="Spécialité", font=('arial', 14, 'bold'), bg='sky blue', fg='black')
+            spec_label.grid(row=2, column=0, padx=20, pady=10)
+
+            email_label = Label(frame3, text="Email", font=('arial', 14, 'bold'), bg='sky blue', fg='black')
+            email_label.grid(row=3, column=0, padx=20, pady=10)
+
+            tel_label = Label(frame3, text="Téléphone", font=('arial', 14, 'bold'), bg='sky blue', fg='black')
+            tel_label.grid(row=4, column=0, padx=20, pady=10)
+
+            sal_label = Label(frame3, text="Salaire", font=('arial', 14, 'bold'), bg='sky blue', fg='black')
+            sal_label.grid(row=5, column=0, padx=20, pady=10)
+
+            age_label = Label(frame3, text="Age", font=('arial', 14, 'bold'), bg='sky blue', fg='black')
+            age_label.grid(row=6, column=0, padx=20, pady=10)
+
+            # Create the form input fields
+            first_name_entry = Entry(frame3, font=('arial', 14, 'bold'), bd=7, relief='sunken')
+            first_name_entry.grid(row=0, column=1, pady=10)
+
+            last_name_entry = Entry(frame3, font=('arial', 14, 'bold'), bd=7, relief='sunken')
+            last_name_entry.grid(row=1, column=1, pady=10)
+
+            spec_entry = Entry(frame3, font=('arial', 14, 'bold'), bd=7, relief='sunken')
+            spec_entry.grid(row=2, column=1, pady=10)
+
+            email_entry = Entry(frame3, font=('arial', 14, 'bold'), bd=7, relief='sunken')
+            email_entry.grid(row=3, column=1, pady=10)
+
+            tel_entry = Entry(frame3, font=('arial', 14, 'bold'), bd=7, relief='sunken')
+            tel_entry.grid(row=4, column=1, pady=10)
+
+            tel_entry.insert(0, "+213")
+
+            sal_entry = Entry(frame3, font=('arial', 14, 'bold'), bd=7, relief='sunken')
+            sal_entry.grid(row=5, column=1, pady=10)
+
+            age_spinbox = Spinbox(frame3, from_=18, to=65, width=5, font=('arial', 14, 'bold'))
+            age_spinbox.grid(row=6, column=1, pady=10)
+
+            # Create the ID label and entry for employee search
+
+
+            add_button = Button(frame3, text='Sauvegarder', width=10, font=('arial', 14, 'bold'), bd=4, relief='raised', bg='white', fg='black', command=save_data)
+            add_button.grid(row=8, column=0, pady=10)
+
+            # Create the Clear button
+            clear_button = Button(frame3, text='Effacer', width=10, font=('arial', 14, 'bold'), bd=4, relief='raised', bg='white', fg='black', command=clear_data)
+            clear_button.grid(row=8, column=2, pady=10)
+
+            id_label = Label(frame3, text="ID employé", font=('arial', 14, 'bold'), bg='sky blue', fg='black')
+            id_label.grid(row=0, column=2, padx=20, pady=10)
+
+            id_entry = Entry(frame3, font=('arial', 14, 'bold'), bd=7, relief='sunken')
+            id_entry.grid(row=1, column=2, pady=10)
+
+            # Create the Search and Save buttons
+            search_button = Button(frame3, text='Rechercher', width=10, font=('arial', 14, 'bold'), bd=4, relief='raised', bg='white', fg='black', command=prefill_form)
+            search_button.grid(row=2, column=2, pady=10)
+
+            frame3.pack(fill=BOTH, expand=True)
+
+
+
+ 
+          
+            mod_frame.pack(pady=20)
+
 
         def retardataire():
             ret_frame = tk.Frame(main_frame)
@@ -437,6 +610,7 @@ def signin():
             mod_indic.config(bg='#c3c3c3')
             retard_indic.config(bg='#c3c3c3')
             absence_indic.config(bg='#c3c3c3')
+            modifier_indic.config(bg='#c3c3c3')
 
 
         def supprimerp():
@@ -466,18 +640,25 @@ def signin():
         mod_indic = tk.Label(option_frame,text='',bg='#c3c3c3')
         mod_indic.place(x=3, y=200, width=5, height=40)
 
+
+        modifier_btn = tk.Button(option_frame, text='modifier',font=('Bold',15),fg='#158aff',bd=0,bg='#c3c3c3', command=lambda: (indicate(modifier_indic,mod)))
+        modifier_btn.place(x=10, y=300)
+
+        modifier_indic = tk.Label(option_frame,text='',bg='#c3c3c3')
+        modifier_indic.place(x=3, y=300, width=5, height=40)
+
         retard_btn = tk.Button(option_frame, text='afficher retard',font=('Bold',15),fg='#158aff',bd=0,bg='#c3c3c3',command=lambda: (indicate(retard_indic,retardataire),rotard()))
-        retard_btn.place(x=10, y=300)
+        retard_btn.place(x=10, y=400)
 
         retard_indic = tk.Label(option_frame,text='',bg='#c3c3c3')
-        retard_indic.place(x=3, y=300, width=5, height=40)
+        retard_indic.place(x=3, y=400, width=5, height=40)
 
 
         absence_btn = tk.Button(option_frame, text='afficher absence',font=('Bold',15),fg='#158aff',bd=0,bg='#c3c3c3',command=lambda: (indicate(absence_indic,les_abssences),mois()))
-        absence_btn.place(x=10, y=400)
+        absence_btn.place(x=10, y=500)
 
         absence_indic = tk.Label(option_frame,text='',bg='#c3c3c3')
-        absence_indic.place(x=3, y=400, width=5, height=40)
+        absence_indic.place(x=3, y=500, width=5, height=40)
 
 
         option_frame.pack(side=tk.LEFT)
@@ -485,6 +666,79 @@ def signin():
         option_frame.configure(width=150, height=500)
 
         main_frame = tk.Frame(r, highlightbackground='black',highlightthickness=2)
+        db = mysql.connector.connect(
+            host="localhost",
+            user="root",
+            password="anis1234",
+            database="firstp"
+        )
+
+        conn = db.cursor()
+        conn.execute("SELECT * FROM employer ORDER BY id")
+        rows = conn.fetchall()
+
+        tree = ttk.Treeview(main_frame)
+        tree['show'] = 'headings'
+
+        s = ttk.Style(main_frame)
+        s.theme_use("clam")
+        s.configure(".", font=('Helvetica', 11))
+        s.configure("Treeview.Heading", foreground='#57a1f8', font=('Helvetica', 11, "bold"))
+
+    # Define number of columns
+        tree["columns"] = ("id", "nom", "prenom", "titre", "age")
+
+    # Assign the width, minwidth, and anchor to the respective columns
+        tree.column("id", width=150, minwidth=100, anchor=tk.CENTER)
+        tree.column("nom", width=150, minwidth=100, anchor=tk.CENTER)
+        tree.column("prenom", width=150, minwidth=100, anchor=tk.CENTER)
+        tree.column("titre", width=150, minwidth=150, anchor=tk.CENTER)
+        tree.column("age", width=150, minwidth=150, anchor=tk.CENTER)
+
+    # Assign the heading names to the respective columns
+        tree.heading("id", text="Id", anchor=tk.CENTER)
+        tree.heading("nom", text="Nom", anchor=tk.CENTER)
+        tree.heading("prenom", text="Prénom", anchor=tk.CENTER)
+        tree.heading("titre", text="Spécialitée", anchor=tk.CENTER)
+        tree.heading("age", text="Age", anchor=tk.CENTER)
+        t = 1
+        for row in rows:
+                if t % 2 == 0:
+                    tree.insert('', "end", text="", values=row, tags=("even",), iid=row[0])
+                else:
+                    tree.insert('', "end", text="", values=row, tags=("odd",), iid=row[0])
+                t += 1
+
+        tree.tag_configure("even", foreground='#57a1f8', background="black")
+        tree.tag_configure("odd", foreground="black", background='#57a1f8')
+        def get_selected_item(event):
+                selected_item = tree.selection()[0]
+                item_id = selected_item
+                print("ID sélectionné :", item_id)
+
+    # Lier la fonction à l'événement de sélection d'une ligne
+        tree.bind("<<TreeviewSelect>>", get_selected_item)
+
+    # Afficher le Treeview
+        tree.pack()
+
+        hsb = ttk.Scrollbar(main_frame, orient="horizontal")
+        hsb.configure(command=tree.xview)
+        tree.configure(xscrollcommand=hsb.set)
+        hsb.pack(fill=tk.X, side=tk.BOTTOM)
+
+        vsb = ttk.Scrollbar(main_frame, orient="vertical")
+        vsb.configure(command=tree.yview)
+        tree.configure(yscrollcommand=vsb.set)
+        vsb.pack(fill=tk.Y, side=tk.RIGHT)
+
+        
+        
+
+
+
+            
+        
         main_frame.pack(side=tk.LEFT)
         main_frame.pack_propagate(False)
         main_frame.configure(width=774, height=500)
@@ -529,6 +783,7 @@ def face():
     age = age_spinbox.get()
     email = email_entry.get()
     tel = tel_entry.get()
+    salaire =  sal_entry.get()
 
     # Save the image path in the database
     label = nom.replace(" ", "-").lower()
@@ -536,8 +791,8 @@ def face():
     os.makedirs(os.path.join(image_dir, label), exist_ok=True)
     image_path = os.path.join(image_dir, label, f"{x}.png")
 
-    query = "INSERT INTO employer (Nomemployer, photoemployer, prenom, titre, age, email,tel ) VALUES (%s, %s, %s, %s, %s, %s, %s)"
-    values = (label, image_path, prenom, titre, age, email, tel )
+    query = "INSERT INTO employer (Nomemployer, photoemployer, prenom, titre,salaire , age, email,tel ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+    values = (label, image_path, prenom, titre, salaire, age, email, tel )
 
     try:
         db = mysql.connector.connect(
@@ -748,26 +1003,28 @@ def face():
             start_face_detection()
         
  frame1 = LabelFrame(boot, text="Enregistrer", font=('arial', 20, 'bold'), bd=20, relief='ridge', bg='sky blue', fg='black')
- frame1.place(x=280, y=20)
+ frame1.place(x=200, y=2)
 
- first_name_label = Label(frame1, text="Nom employer", font=('arial', 14, 'bold'), bg='sky blue', fg='black')
+ first_name_label = Label(frame1, text="Nom employé", font=('arial', 14, 'bold'), bg='sky blue', fg='black')
  first_name_label.grid(row=0, column=0, padx=20, pady=10)
 
- last_name_label = Label(frame1, text="Prénom employer", font=('arial', 14, 'bold'), bg='sky blue', fg='black')
+ last_name_label = Label(frame1, text="Prénom employé", font=('arial', 14, 'bold'), bg='sky blue', fg='black')
  last_name_label.grid(row=1, column=0, padx=20, pady=10)
 
- spec_label = Label(frame1, text="Spécialitée", font=('arial', 14, 'bold'), bg='sky blue', fg='black')
+ spec_label = Label(frame1, text="Spécialité", font=('arial', 14, 'bold'), bg='sky blue', fg='black')
  spec_label.grid(row=2, column=0, padx=20, pady=10)
 
  email_label = Label(frame1, text="Email", font=('arial', 14, 'bold'), bg='sky blue', fg='black')
  email_label.grid(row=3, column=0, padx=20, pady=10)
 
- tel_label = Label(frame1, text="Télléphone", font=('arial', 14, 'bold'), bg='sky blue', fg='black')
- tel_label.grid(row=4, column=0,
-                 padx=20, pady=10)
+ tel_label = Label(frame1, text="Téléphone", font=('arial', 14, 'bold'), bg='sky blue', fg='black')
+ tel_label.grid(row=4, column=0, padx=20, pady=10)
+
+ sal_label = Label(frame1, text="Salaire", font=('arial', 14, 'bold'), bg='sky blue', fg='black')
+ sal_label.grid(row=5, column=0, padx=20, pady=10)
 
  age_label = Label(frame1, text="Age", font=('arial', 14, 'bold'), bg='sky blue', fg='black')
- age_label.grid(row=5, column=0, padx=20, pady=10)
+ age_label.grid(row=6, column=0, padx=20, pady=10)
 
  first_name_entry = Entry(frame1, font=('arial', 14, 'bold'), bd=7, relief='sunken')
  first_name_entry.grid(row=0, column=1, pady=10)
@@ -783,8 +1040,12 @@ def face():
 
  tel_entry.insert(0, "+213")
 
+ sal_entry = Entry(frame1, font=('arial', 14, 'bold'), bd=7, relief='sunken')
+ sal_entry.grid(row=5, column=1, pady=10)
+
+
  age_spinbox = Spinbox(frame1, from_=18, to=65, width=5, font=('arial', 14, 'bold'))
- age_spinbox.grid(row=5, column=1, pady=10)
+ age_spinbox.grid(row=6, column=1, pady=10)
 
  def clear_data():
     # Function to clear all the data
@@ -792,6 +1053,7 @@ def face():
     last_name_entry.delete(0, 'end')
     spec_entry.delete(0, 'end')
     email_entry.delete(0, 'end')
+    sal_entry.dele(0, 'end')
     tel_entry.delete(+213, 'end')
     
 
@@ -802,11 +1064,11 @@ def face():
 
 # Create the Refresh button with the refresh icon
  refrech_button = Button(frame1, text=refresh_icon, width=10, font=refresh_font, bd=4, relief='raised', bg='white', fg='black', command=clear_data)
- refrech_button.grid(row=6, column=1, pady=10)
- add_button = Button(frame1, text='ajouter', width=10, font=('arial', 14, 'bold'), bd=4, relief='raised', bg='white', fg='black', command=start_face_detection_and_add_data)
- add_button.grid(row=6, column=0, pady=10)
- delete_button = Button(frame1, text='supprimer', width=10, font=('arial', 14, 'bold'), bd=4, relief='raised', bg='white', fg='black', command=delete_data)
- delete_button.grid(row=6, column=2, pady=10)
+ refrech_button.grid(row=7, column=1, pady=10)
+ add_button = Button(frame1, text='Ajouter', width=10, font=('arial', 14, 'bold'), bd=4, relief='raised', bg='white', fg='black', command=start_face_detection_and_add_data)
+ add_button.grid(row=7, column=0, pady=10)
+ delete_button = Button(frame1, text='Supprimer', width=10, font=('arial', 14, 'bold'), bd=4, relief='raised', bg='white', fg='black', command=delete_data)
+ delete_button.grid(row=7, column=2, pady=10)
 
 
  
