@@ -1,3 +1,4 @@
+import shutil
 from tkinter import *
 from tkinter import messagebox
 from datetime import date
@@ -16,6 +17,7 @@ import re
 import mysql.connector
 from datetime import datetime, timedelta
 from calendar import monthrange
+import tkinter.font as tkFont
 
 import pathlib
 import sqlite3 
@@ -27,7 +29,7 @@ root.configure(bg="#fff")
 # root.state('zoomed')
 root.resizable(False, False)
 def on_closing():
-        if messagebox.askokcancel("Quit", "Do you want to quit?"):
+        if messagebox.askokcancel("Quit", "Voullez vous quitter cette page ?"):
          root.destroy()
 
 root.protocol("WM_DELETE_WINDOW", on_closing)
@@ -80,7 +82,7 @@ def rotard():
     nom = cur.fetchall()
     print(nom)
 
-    result_label = Label(frame, text="Nomber de retard par mois :", font=("Arial", 14), bg="#e0eaf5")
+    result_label = Label(frame, text="Nombre de retard par mois :", font=("Arial", 14), bg="#e0eaf5")
     result_label.pack()
 
     for row in nom:
@@ -109,7 +111,7 @@ def rotard():
         # Perform the refresh logic here
         now = datetime.now()
         current_date = now.strftime('%Y-%m-%d')
-        print("Refreshing data for date:", current_date)
+        print("Actualiser les données", current_date)
 
         # Execute your SQL queries or update the display as needed
 
@@ -130,10 +132,10 @@ def rotard():
     print(nom)
 
     # Create a Label to display the data
-    refresh_button = Button(frame, text="Refresh", command=refresh_data, font=("Arial", 12), bg="#4299e1", fg="#ffffff")
+    refresh_button = Button(frame, text="Actualiser", command=refresh_data, font=("Arial", 12), bg="#4299e1", fg="#ffffff")
     refresh_button.pack()
 
-    result_label = Label(frame, text="Data will be displayed here.", font=("Arial", 14), bg="#e0eaf5")
+    result_label = Label(frame, text="Données seront afficher ici.", font=("Arial", 14), bg="#e0eaf5")
     result_label.pack(pady=10)
 
     # Create a separate Label for each row of data and pack them into the root window
@@ -268,7 +270,7 @@ def mois():
   cur.execute(dd)
   result = cur.fetchall()
   my_tuple = [(29,)]
-  liste = [my_tuple[0][0]]
+  liste = [result[0][0]+1]
   print(liste)
   cur.execute(qqqq,liste)
   result = cur.fetchall()
@@ -282,14 +284,14 @@ def mois():
   tuple2_with_column = [(item[0], item[1], True) if item[0] in set_tuple1 else item for item in result]
   tuple22_with_column = [(item[0], item[1], True if item[0] in set_tuple1 else False) for item in result]
   print(tuple22_with_column)
-  tree = ttk.Treeview(toot, columns=("Name", "Absences", "Absent"), show="headings")
+  tree = ttk.Treeview(toot, columns=("Nom", "Absences", "Absent"), show="headings")
 
-  tree.column("Name", width=300)
+  tree.column("Nom", width=300)
   tree.column("Absences", width=150)
   tree.column("Absent", width=100)
 
-  tree.heading("Name", text="Name")
-  tree.heading("Absences", text="Absences")
+  tree.heading("Nom", text="Nom")
+  tree.heading("Absences", text="Nombre d'absences")
   tree.heading("Absent", text="Absent")
 
 # Insert data into the Treeview
@@ -309,7 +311,7 @@ def mois():
 
 
 # Display the number of absences
-  label_count = tk.Label(toot, text="Number of absences within the last 30 days: {}".format(len(result)), font=('calibre', 14, 'bold'), bg="#fff")
+  label_count = tk.Label(toot, text="Nombre d'absence dans le mois dernier : ", font=('calibre', 14, 'bold'), bg="#fff")
   label_count.pack()
 
 # Display the Treeview widget
@@ -326,176 +328,177 @@ def signin():
         root.withdraw()
 
         r = Toplevel(root)
-        r.title('acceuil')
+        r.title('accueil')
         r.geometry('925x500+200+100')
-        image_icon = PhotoImage(file="C:\\Users\\Anis_\\OneDrive\\Bureau\\peter-dinklage\\1.png")
+        image_icon = PhotoImage(file="C:\\Users\\Anis_\\OneDrive\\Bureau\\login.png")
         r.iconphoto(False, image_icon)
-  
+        def liste():
+            liste_frame = tk.Frame(main_frame)
+            db = mysql.connector.connect(
+            host="localhost",
+            user="root",
+            password="anis1234",
+            database="firstp"
+        )
 
-        db = mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="anis1234",
-        database="firstp"
-      )
+            conn = db.cursor()
+            conn.execute("SELECT * FROM employer ORDER BY id")
+            rows = conn.fetchall()
 
-        conn = db.cursor()
-        conn.execute("SELECT * FROM employer ORDER BY id")
-        rows = conn.fetchall()
+            tree = ttk.Treeview(liste_frame)
+            tree['show'] = 'headings'
 
-        tree = ttk.Treeview(r)
-        tree['show'] = 'headings'
+            s = ttk.Style(liste_frame)
+            s.theme_use("clam")
+            s.configure(".", font=('Helvetica', 11))
+            s.configure("Treeview.Heading", foreground='#57a1f8', font=('Helvetica', 11, "bold"))
 
-        s = ttk.Style(r)
-        s.theme_use("clam")
-        s.configure(".", font=('Helvetica', 11))
-        s.configure("Treeview.Heading", foreground='#57a1f8', font=('Helvetica', 11, "bold"))
+    # Define number of columns
+            tree["columns"] = ("id", "nom", "prenom", "titre", "age")
 
-# Define number of columns
-        tree["columns"] = ("id", "nom", "prenom", "age", "titre")
+    # Assign the width, minwidth, and anchor to the respective columns
+            tree.column("id", width=150, minwidth=100, anchor=tk.CENTER)
+            tree.column("nom", width=150, minwidth=100, anchor=tk.CENTER)
+            tree.column("prenom", width=150, minwidth=100, anchor=tk.CENTER)
+            tree.column("titre", width=150, minwidth=150, anchor=tk.CENTER)
+            tree.column("age", width=150, minwidth=150, anchor=tk.CENTER)
 
-# Assign the width, minwidth, and anchor to the respective columns
-        tree.column("id", width=150, minwidth=100, anchor=tk.CENTER)
-        tree.column("nom", width=150, minwidth=100, anchor=tk.CENTER)
-        tree.column("prenom", width=150, minwidth=100, anchor=tk.CENTER)
-        tree.column("age", width=150, minwidth=150, anchor=tk.CENTER)
-        tree.column("titre", width=150, minwidth=150, anchor=tk.CENTER)
+    # Assign the heading names to the respective columns
+            tree.heading("id", text="Id", anchor=tk.CENTER)
+            tree.heading("nom", text="Nom", anchor=tk.CENTER)
+            tree.heading("prenom", text="Prénom", anchor=tk.CENTER)
+            tree.heading("titre", text="Spécialitée", anchor=tk.CENTER)
+            tree.heading("age", text="Age", anchor=tk.CENTER)
+            t = 1
+            for row in rows:
+                if t % 2 == 0:
+                    tree.insert('', "end", text="", values=row, tags=("even",), iid=row[0])
+                else:
+                    tree.insert('', "end", text="", values=row, tags=("odd",), iid=row[0])
+                t += 1
 
-# Assign the heading names to the respective columns
-        tree.heading("id", text="Id", anchor=tk.CENTER)
-        tree.heading("nom", text="Nom", anchor=tk.CENTER)
-        tree.heading("prenom", text="Prénom", anchor=tk.CENTER)
-        tree.heading("age", text="Age", anchor=tk.CENTER)
-        tree.heading("titre", text="Spécialitée", anchor=tk.CENTER)
-        t = 1;  
-        for row in rows:
-          if t % 2 == 0:
-              tree.insert('', "end", text="", values=row, tags=("even",),iid=row[0])
-              t=t+1
-          else:
-              tree.insert('', "end", text="", values=row, tags=("odd",),iid=row[0])
-              t=t+1
+            tree.tag_configure("even", foreground='#57a1f8', background="black")
+            tree.tag_configure("odd", foreground="black", background='#57a1f8')
+            def get_selected_item(event):
+                selected_item = tree.selection()[0]
+                item_id = selected_item
+                print("ID sélectionné :", item_id)
 
-        tree.tag_configure("even", foreground='#57a1f8', background="black")
-        tree.tag_configure("odd", foreground="black", background='#57a1f8')
-        def get_selected_item(event):
-            selected_item = tree.selection()[0]
-            item_id = selected_item
-            print("ID sélectionné :", item_id)
-        def open_edit_window(event):
-            selected_item = tree.selection()[0]
-            item_values = tree.item(selected_item, "values")
+    # Lier la fonction à l'événement de sélection d'une ligne
+            tree.bind("<<TreeviewSelect>>", get_selected_item)
 
-            # Créer une nouvelle fenêtre pour l'édition
-            edit_window = tk.Toplevel(r)
+    # Afficher le Treeview
+            tree.pack()
 
-            # Créer les champs de modification des colonnes
-            id_label = tk.Label(edit_window, text="ID:")
-            id_label.pack()
-            id_entry = tk.Entry(edit_window)
-            id_entry.insert(0, item_values[0])
-            id_entry.pack()
+            hsb = ttk.Scrollbar(liste_frame, orient="horizontal")
+            hsb.configure(command=tree.xview)
+            tree.configure(xscrollcommand=hsb.set)
+            hsb.pack(fill=tk.X, side=tk.BOTTOM)
 
-            nom_label = tk.Label(edit_window, text="Nom:")
-            nom_label.pack()
-            nom_entry = tk.Entry(edit_window)
-            nom_entry.insert(0, item_values[1])
-            nom_entry.pack()
-
-            prenom_label = tk.Label(edit_window, text="Prénom:")
-            prenom_label.pack()
-            prenom_entry = tk.Entry(edit_window)
-            prenom_entry.insert(0, item_values[2])
-            prenom_entry.pack()
-
-            age_label = tk.Label(edit_window, text="Âge:")
-            age_label.pack()
-            age_entry = tk.Entry(edit_window)
-            age_entry.insert(0, item_values[3])
-            age_entry.pack()
-
-            titre_label = tk.Label(edit_window, text="Titre:")
-            titre_label.pack()
-            titre_entry = tk.Entry(edit_window)
-            titre_entry.insert(0, item_values[4])
-            titre_entry.pack()
-
-        # Créer la fenêtre principale
-        r = tk.Tk()
-
-        # Créer le Treeview
-        tree = ttk.Treeview(r)
-        tree["columns"] = ("id", "nom", "prenom", "age", "titre")
-
-        # ...
-
-        # Lier la fonction à l'événement de sélection d'une ligne
-        tree.bind("<<TreeviewSelect>>", open_edit_window)
-
-        # ...
-
-        # Afficher le Treeview
-        tree.pack()
-# Lier la fonction à l'événement de sélection d'une ligne
-        tree.bind("<<TreeviewSelect>>", get_selected_item)
-
-# Afficher le Treeview
-        tree.pack()
-        
-
-        hsb = ttk.Scrollbar(r, orient="horizontal")
-        hsb.configure(command=tree.xview)
-        tree.configure(xscrollcommand=hsb.set)
-        hsb.pack(fill=tk.X, side=tk.BOTTOM)
-
-        vsb = ttk.Scrollbar(r, orient="vertical")
-        vsb.configure(command=tree.yview)
-        tree.configure(yscrollcommand=vsb.set)
-        vsb.pack(fill=tk.Y, side=tk.RIGHT)
-
-
-        insertbutton = tk.Button(r,text="Ajout ou Supp",command=face)
-        insertbutton.configure(font =('calibri', 14, 'bold'),bg='#57a1f8',fg='white',border=0)
-        insertbutton.place(x=150,y=260)
-
-
-        reterdtbutton = tk.Button(r,text="afficher retard",command=rotard)
-        reterdtbutton.configure(font =('calibri', 14, 'bold'), bg='#57a1f8',fg='white',border=0)
-        reterdtbutton.place(x=300,y=260)
-
-        absentbutton = tk.Button(r,text="afficher absence",command=mois)
-        absentbutton.configure(font =('calibri', 14, 'bold'),bg='#57a1f8',fg='white',border=0)
-        absentbutton.place(x=450,y=260)
-
-
-        abss = tk.Button(r,text="abssence",command=now)
-        abss.configure(font =('calibri', 14, 'bold'), bg='#57a1f8',fg='white',border=0)
-        abss.place(x=600,y=260)
-
-
-      
-
-
-
-        tree.pack()
+            vsb = ttk.Scrollbar(liste_frame, orient="vertical")
+            vsb.configure(command=tree.yview)
+            tree.configure(yscrollcommand=vsb.set)
+            vsb.pack(fill=tk.Y, side=tk.RIGHT)
 
         
-
         
 
 
 
+            
 
-     
 
-    elif username!='aa'and password!='a':
-        messagebox.showerror("invalid","invalid username and password")
+            liste_frame.pack(pady=20)
 
-    elif  password!='a':
-        messagebox.showerror("invalid","invalid  password")
 
-    elif username!='aa':
-        messagebox.showerror("invalid","invalid username ")        
+        def ajou():
+            home_frame = tk.Frame(main_frame)
+            lb = tk.Label(home_frame,text='',font=('Bold',15))
+            lb.pack()
+
+            home_frame.pack(pady=20)
+
+        def retardataire():
+            ret_frame = tk.Frame(main_frame)
+            lb = tk.Label(ret_frame,text='',font=('Bold',15))
+            lb.pack()
+
+            ret_frame.pack(pady=20)
+
+        def les_abssences():
+            abs_frame = tk.Frame(main_frame)
+            lb = tk.Label(abs_frame,text='',font=('Bold',15))
+            lb.pack()
+
+            abs_frame.pack(pady=20)
+
+        def  hide_indicator():
+            list_indic.config(bg='#c3c3c3')
+            mod_indic.config(bg='#c3c3c3')
+            retard_indic.config(bg='#c3c3c3')
+            absence_indic.config(bg='#c3c3c3')
+
+
+        def supprimerp():
+            for frame in main_frame.winfo_children():
+                frame.destroy()
+
+
+        def indicate(lb, page ):
+            hide_indicator()
+            lb.config(bg='#158aff')
+            supprimerp()
+            page()
+
+
+
+        option_frame = tk.Frame(r,bg='#c3c3c3')
+
+        list_btn = tk.Button(option_frame, text='afficher la liste',font=('Bold',15),fg='#158aff',bd=0,bg='#c3c3c3', command=lambda: indicate(list_indic,liste))
+        list_btn.place(x=10, y=100)
+
+        list_indic = tk.Label(option_frame,text='',bg='#c3c3c3')
+        list_indic.place(x=3, y=100, width=5, height=40)
+
+        mod_btn = tk.Button(option_frame, text='ajout/supp',font=('Bold',15),fg='#158aff',bd=0,bg='#c3c3c3', command=lambda: (indicate(mod_indic,ajou),face()))
+        mod_btn.place(x=10, y=200)
+
+        mod_indic = tk.Label(option_frame,text='',bg='#c3c3c3')
+        mod_indic.place(x=3, y=200, width=5, height=40)
+
+        retard_btn = tk.Button(option_frame, text='afficher retard',font=('Bold',15),fg='#158aff',bd=0,bg='#c3c3c3',command=lambda: (indicate(retard_indic,retardataire),rotard()))
+        retard_btn.place(x=10, y=300)
+
+        retard_indic = tk.Label(option_frame,text='',bg='#c3c3c3')
+        retard_indic.place(x=3, y=300, width=5, height=40)
+
+
+        absence_btn = tk.Button(option_frame, text='afficher absence',font=('Bold',15),fg='#158aff',bd=0,bg='#c3c3c3',command=lambda: (indicate(absence_indic,les_abssences),mois()))
+        absence_btn.place(x=10, y=400)
+
+        absence_indic = tk.Label(option_frame,text='',bg='#c3c3c3')
+        absence_indic.place(x=3, y=400, width=5, height=40)
+
+
+        option_frame.pack(side=tk.LEFT)
+        option_frame.pack_propagate(False)
+        option_frame.configure(width=150, height=500)
+
+        main_frame = tk.Frame(r, highlightbackground='black',highlightthickness=2)
+        main_frame.pack(side=tk.LEFT)
+        main_frame.pack_propagate(False)
+        main_frame.configure(width=774, height=500)
+                
+
+
+    elif username!='admin'and password!='aaaa':
+        messagebox.showerror("invalid","invalid nom d'utilisateur and mot de passe")
+
+    elif  password!='':
+        messagebox.showerror("invalid","mot de passe incorrecte")
+
+    elif username!='':
+        messagebox.showerror("invalid","nom d'utilisateur incorrecte")        
 
 
 
@@ -516,6 +519,8 @@ def face():
  boot.geometry('925x500+200+100')
  boot.configure(bg="#fff")
  boot.resizable(False, False)
+ 
+ 
 
  def add_data():
     nom = first_name_entry.get()
@@ -544,43 +549,95 @@ def face():
         cur = db.cursor()
         cur.execute(query, values)
         db.commit()
-        messagebox.showinfo("Success", "Data added to the database")
+        messagebox.showinfo("Success", "Données ajoutées")
     except Error as error:
-        messagebox.showerror("Error", f"Failed to add data to the database: {error}")
+        messagebox.showerror("Error", f"Echec d'ajout des données: {error}")
     finally:
         if db.is_connected():
             cur.close()
             db.close()
 
  def delete_data():
-    nom = first_name_entry.get()
-    prenom = last_name_entry.get()
-    titre = spec_entry.get()
-    age = age_spinbox.get()
-    email = email_entry.get()
-    tel = tel_entry.get()
+    frame2 = LabelFrame(boot, text="Supression", font=('arial', 20, 'bold'), bd=20, relief='ridge', bg='sky blue', fg='black')
+    frame2.place(x=100, y=20)
+ 
+    # Labels
+    nom_label = Label(frame2, text="Nom employer", font=('arial', 14, 'bold'), bg='sky blue', fg='black')
+    nom_label.grid(row=0, column=0, padx=20, pady=10)
 
+    prenom_label = Label(frame2, text="Prénom employer", font=('arial', 14, 'bold'), bg='sky blue', fg='black')
+    prenom_label.grid(row=1, column=0, padx=20, pady=10)
+    
 
-    query = "DELETE FROM employer WHERE Nomemployer = %s AND prenom = %s AND titre = %s AND age = %s AND email = %sAND tel = %s"
-    values = (nom, prenom, titre, age, email ,tel )
+    nom_entry = Entry(frame2, font=('arial', 14, 'bold'), bd=7, relief='sunken')
+    nom_entry.grid(row=0, column=1, pady=10)
+    prenom_entry = Entry(frame2, font=('arial', 14, 'bold'), bd=7, relief='sunken')
+    prenom_entry.grid(row=1, column=1, pady=10)
+    
 
-    try:
-        db = mysql.connector.connect(
-            host="localhost",
-            user="root",
-            password="anis1234",
-            database='firstp'
-        )
-        cur = db.cursor()
-        cur.execute(query, values)
-        db.commit()
-        messagebox.showinfo("Success", "Data deleted from the database")
-    except Error as error:
-        messagebox.showerror("Error", f"Failed to delete data from the database: {error}")
-    finally:
-        if db.is_connected():
-            cur.close()
-            db.close()
+    def supp():
+        nom = nom_entry.get()
+        prenom = prenom_entry.get()
+
+        try:
+            db = mysql.connector.connect(
+                host="localhost",
+                user="root",
+                password="anis1234",
+                database='firstp'
+            )
+            cur = db.cursor()
+            print(nom)
+            print(prenom)
+            q="SELECT id FROM employer WHERE Nomemployer= %s AND prenom = %s"
+            query = "DELETE FROM employer WHERE Nomemployer = %s AND prenom = %s"
+            values = (nom, prenom)
+            
+            # Execute the delete query with the provided values
+            cur.execute(q, values)
+            d = cur.fetchone()
+            print(d)
+            if d!=None:
+                dd=d[0]
+                print(dd)
+                list = values
+                list=list+(dd,)
+                print(list)
+                qq="INSERT INTO archive ( nom, prenom,id) VALUES (%s,%s,%s)"     
+                cur.execute(qq, list)
+                db.commit()
+                cur.execute(query, values)
+                db.commit()
+
+                # Remove the specific employee's directory based on their name
+                BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+                image_dir = os.path.join(BASE_DIR, "images", nom.lower().replace(" ", "-"))
+                print(image_dir)
+                shutil.rmtree(image_dir)
+                
+                # Show a success message
+                messagebox.showinfo("Success", "suppression reussit")
+            else:   
+                messagebox.showerror("Error", "Entrer un employée deja existant") 
+        except mysql.connector.Error as error:
+            # Show an error message if the deletion fails
+            messagebox.showerror("Erreur", f"Echec de suppression des données : {error}")
+        finally:
+            if db.is_connected():
+                cur.close()
+                db.close()
+
+        # Close frame2 after successful deletion
+        frame2.destroy()
+
+    supp_button = Button(frame2, text='Supprimer', width=10, font=('arial', 14, 'bold'), bd=4, relief='raised', bg='white', fg='black', command=supp)
+    supp_button.grid(row=2, column=0, padx=20, pady=10)
+
+    def close_frame2():
+        frame2.destroy()  # Destroy the frame2 widget
+
+    cancel_button = Button(frame2, text='Annuler', width=10, font=('arial', 14, 'bold'), bd=4, relief='raised', bg='white', fg='black', command=close_frame2)
+    cancel_button.grid(row=2, column=1, padx=20, pady=10)
 
  def start_face_detection():
     global x
@@ -592,7 +649,7 @@ def face():
     while True:
         ret, img = cap.read()
         if not ret:
-            print("Error: Cannot access the camera.")
+            print("Erreur : la camera ne s'allume pas.")
             break
 
         cv2.imshow('img', img)
@@ -690,14 +747,9 @@ def face():
             add_data()
             start_face_detection()
         
-    
- 
-
-    # Label Frame
- frame1 = LabelFrame(boot, text="Register", font=('arial', 20, 'bold'), bd=20, relief='ridge', bg='sky blue', fg='black')
+ frame1 = LabelFrame(boot, text="Enregistrer", font=('arial', 20, 'bold'), bd=20, relief='ridge', bg='sky blue', fg='black')
  frame1.place(x=280, y=20)
 
-    # Labels
  first_name_label = Label(frame1, text="Nom employer", font=('arial', 14, 'bold'), bg='sky blue', fg='black')
  first_name_label.grid(row=0, column=0, padx=20, pady=10)
 
@@ -717,7 +769,6 @@ def face():
  age_label = Label(frame1, text="Age", font=('arial', 14, 'bold'), bg='sky blue', fg='black')
  age_label.grid(row=5, column=0, padx=20, pady=10)
 
-    # Entry
  first_name_entry = Entry(frame1, font=('arial', 14, 'bold'), bd=7, relief='sunken')
  first_name_entry.grid(row=0, column=1, pady=10)
  last_name_entry = Entry(frame1, font=('arial', 14, 'bold'), bd=7, relief='sunken')
@@ -727,36 +778,35 @@ def face():
 
  email_entry = Entry(frame1, font=('arial', 14, 'bold'), bd=7, relief='sunken')
  email_entry.grid(row=3, column=1, pady=10)
- 
-
-
-             
- 
  tel_entry = Entry(frame1, font=('arial', 14, 'bold'), bd=7, relief='sunken')
  tel_entry.grid(row=4, column=1, pady=10)
 
  tel_entry.insert(0, "+213")
 
-# Function to handle the entry focus
-# def handle_entry_focus(event):
- #   if tel_entry.get() == "":
-  #      tel_entry.delete(0, '+213')
-
-# Bind the focus event to the entry widget
- #tel_entry.bind("<FocusIn>", handle_entry_focus)
- 
-   #email
-
-
-    # Spinbox
  age_spinbox = Spinbox(frame1, from_=18, to=65, width=5, font=('arial', 14, 'bold'))
  age_spinbox.grid(row=5, column=1, pady=10)
 
-    # Buttons
- add_button = Button(frame1, text='Add', width=10, font=('arial', 14, 'bold'), bd=4, relief='raised', bg='white', fg='black', command=start_face_detection_and_add_data)
+ def clear_data():
+    # Function to clear all the data
+    first_name_entry.delete(0, 'end')
+    last_name_entry.delete(0, 'end')
+    spec_entry.delete(0, 'end')
+    email_entry.delete(0, 'end')
+    tel_entry.delete(+213, 'end')
+    
+
+ refresh_icon = "\u21BA"
+
+# Create a custom font for the refresh icon
+ refresh_font = tkFont.Font(family="Arial", size=14, weight="bold")
+
+# Create the Refresh button with the refresh icon
+ refrech_button = Button(frame1, text=refresh_icon, width=10, font=refresh_font, bd=4, relief='raised', bg='white', fg='black', command=clear_data)
+ refrech_button.grid(row=6, column=1, pady=10)
+ add_button = Button(frame1, text='ajouter', width=10, font=('arial', 14, 'bold'), bd=4, relief='raised', bg='white', fg='black', command=start_face_detection_and_add_data)
  add_button.grid(row=6, column=0, pady=10)
- delete_button = Button(frame1, text='Delete', width=10, font=('arial', 14, 'bold'), bd=4, relief='raised', bg='white', fg='black', command=delete_data)
- delete_button.grid(row=6, column=1, pady=10)
+ delete_button = Button(frame1, text='supprimer', width=10, font=('arial', 14, 'bold'), bd=4, relief='raised', bg='white', fg='black', command=delete_data)
+ delete_button.grid(row=6, column=2, pady=10)
 
 
  
@@ -772,47 +822,47 @@ Label(root,image=img,bg='white').place(x=50,y=50)
 frame=Frame(root,width=350,height=350,bg="white")
 frame.place(x=480, y=70)
 
-heading=Label(frame,text='sign in',fg='#57a1f8', bg='white', font=('Microsoft YaHei UI Light',23,'bold'))
+heading=Label(frame,text='CamPoint',fg='#57a1f8', bg='white', font=('Microsoft YaHei UI Light',23,'bold'))
 heading.place(x=100,y=5)
 ###-----------------------------------
 
 def on_entry_click(event):
-    if user.get() == 'Username':
+    if user.get() == 'Nom Utilisateur':
         user.delete(0, END)
         user.configure(fg='black')
 
 def on_exit(event):
     if user.get() == '':
-        user.insert(0, 'Username')
+        user.insert(0, 'Nom Utilisateur')
         user.configure(fg='gray')
 
 user = Entry(frame, width=25, fg='gray', border=0, bg='white', font=('Microsoft YaHei UI Light', 11))
 user.place(x=30, y=80)
-user.insert(0, 'Username')
+user.insert(0, 'Nom Utilisateur')
 user.bind('<FocusIn>', on_entry_click)
 user.bind('<FocusOut>', on_exit)
 Frame(frame, width=295, height=2, bg='black').place(x=25, y=107)
 
 def on_password_entry_click(event):
-    if code.get() == 'Password':
+    if code.get() == 'mot de passe':
         code.delete(0, END)
         code.configure(show='*', fg='black')
 
 def on_password_exit(event):
     if code.get() == '':
-        code.insert(0, 'Password')
+        code.insert(0, 'mot de passe')
         code.configure(show='', fg='gray')
 
 code = Entry(frame, width=25, fg='gray', border=0, bg='white', show='', font=('Microsoft YaHei UI Light', 11))
 code.place(x=30, y=150)
-code.insert(0, 'Password')
+code.insert(0, 'mot de passe')
 code.bind('<FocusIn>', on_password_entry_click)
 code.bind('<FocusOut>', on_password_exit)
 Frame(frame, width=295, height=2, bg='black').place(x=25, y=177)
 
 ##-------------------------------------
 
-Button(frame,width=39,pady=7,text='sign in',bg='#57a1f8',fg='white',border=0, command=signin).place(x=35,y=204)
+Button(frame,width=39,pady=7,text='Confirmer',bg='#57a1f8',fg='white',border=0, command=signin).place(x=35,y=204)
 
 
 root.mainloop()

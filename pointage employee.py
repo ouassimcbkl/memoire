@@ -31,11 +31,11 @@ def function():
     now = datetime.now()
     date=now.strftime('%Y-%m-%d')
     heure=now.strftime('%H:%M:%S')
-    if now.hour <=12 and now.hour >=00:
+    if now.hour <=12 and now.hour >=8:
       exec(open("./Face_recognition_entrerh.py").read())
     else:
-       if now.hour <=24 and now.hour >=12:
-          exec(open("./Face_recognition_entrerh.py").read())
+       if now.hour <=16 and now.hour >=12:
+          exec(open("./Face_recognition_sortieh.py").read())
           
 window = Tk()
 window.title('accueil')
